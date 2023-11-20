@@ -1,4 +1,4 @@
-# AutoCurseScript-
+# AutoCurseScript智慧树刷课脚本
 只能看课不能答题
 # How to use
 
