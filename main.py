@@ -1,29 +1,30 @@
 from selenium import webdriver
-import time
+from time import sleep
 from selenium.webdriver.common.by import By
 
 
-def closeTheAlert(driver):
-    driver.find_element(By.CSS_SELECTOR, ".el-scrollbar__view>.topic>.radio>.topic-list>.topic-item svg").click()
-    print('点击选项')
+def getAccount():
+    file = open("account.txt")
+    account = file.readline()
+    password = file.readline()
+    file.close()
+    return account, password
 
-    driver.find_element(By.CSS_SELECTOR, "#outContainer>.el-dialog__wrapper>.el-dialog>.el-dialog__footer span").click()
-    print('点击关闭')
 
-
-def ini(driver, account, password, loginAndSelectTime):
-    print("正在初始化")
+def ini():
+    driver = webdriver.Edge()
     driver.maximize_window()
     driver.get(
         "https://passport.zhihuishu.com/login?service=https://onlineservice-api.zhihuishu.com/gateway/f/v1/login/gologin")
-    time.sleep(1)
-    driver.find_element(By.ID, "lUsername").send_keys(account)
-    driver.find_element(By.ID, "lPassword").send_keys(password)
-    time.sleep(1)
-    driver.find_element(By.CLASS_NAME, "wall-sub-btn").click()
-    # 休眠，等待用户通过滑动验证码，并点进课程播放页面
-    time.sleep(loginAndSelectTime)
+    return driver
 
+
+def login(driver, args):
+    driver.find_element(By.ID, "lUsername").send_keys(args[0])
+    driver.find_element(By.ID, "lPassword").send_keys(args[1])
+
+
+def closeGarbageMessage():
     try:
         driver.find_element(By.CLASS_NAME, "talk-later-btn").click()
     except(Exception):
@@ -34,7 +35,16 @@ def ini(driver, account, password, loginAndSelectTime):
         driver.find_element(By.CSS_SELECTOR, ".el-dialog__header>i").click()
     except(Exception):
         pass
-    print("初始化完成")
+
+
+# 返回全部课程列表
+def getAllTheCurseLIst():
+    return driver.find_elements(By.CLASS_NAME, "clearfix.video")
+
+
+# 返回之前已完成的课程
+def getTheFinishedCurse():
+    return driver.find_elements(By.CLASS_NAME, "fl.time_icofinish")
 
 
 def unPause(driver):
@@ -42,44 +52,65 @@ def unPause(driver):
     driver.execute_script("arguments[0].play()", video)
 
 
+def closeTheAlert(driver):
+    driver.find_element(By.CSS_SELECTOR, ".el-scrollbar__view>.topic>.radio>.topic-list>.topic-item svg").click()
+    print('点击选项')
+
+    driver.find_element(By.CSS_SELECTOR, "#outContainer>.el-dialog__wrapper>.el-dialog>.el-dialog__footer span").click()
+    print('点击关闭')
+
+
 if __name__ == '__main__':
-    # 输入账号密码
-    account = input("请输入账号\n")
-    password = input("请输入密码\n")
 
-    # 实例化浏览器
-    driver = webdriver.Edge()
-    # 初始化
-    ini(driver, account, password, 25)
-    # 播放
-    print("保存课程列表")
-    icofinishlist = driver.find_elements(By.CLASS_NAME, "fl.time_icofinish")  # 存放之前已完成的课程，列表
-    Allvideolist = driver.find_elements(By.CLASS_NAME, "clearfix.video")  # 存放全部课程，列表
-    Allvideolist[len(icofinishlist)].click()
-    sec = 5
-    print(fr"保存成功，{sec}秒后进入循环")
-    time.sleep(sec)
+    # 初始化浏览器
+    print("正在初始化浏览器")
+    driver = ini()
 
-    print('进入循环')
+    # 获取账号密码并登录
     while True:
+        if driver.find_element(By.ID, "lPassword"):
+            print("登录中...")
+            login(driver, getAccount())
+            break
 
-        time.sleep(1)
-        try:
-            print("正在关闭弹窗")
-            closeTheAlert(driver)
-        except:
-            print("关闭弹窗失败")
-        try:
-            # 播放视频，防止其他原因暂停播放
-            unPause(driver)
-        except:
-            pass
+    # 等待用户通过滑动验证码，并进入播放页面
+    while True:
+        print("等待进入播放页面")
+        if driver.find_elements(By.CLASS_NAME, "clearfix.video"):
+            print("已进入播放页面")
+            closeGarbageMessage()
+            print("关闭垃圾弹窗，即将开始播放\n")
+            Allvideolist = getAllTheCurseLIst()
+            print("已保存全部课程列表")
+            lastFinishedCurse = getTheFinishedCurse()
+            print(f'之前已完成课程数量：{len(lastFinishedCurse)}')
+            Allvideolist[len(lastFinishedCurse)].click()
+            print('初始化课程列表成功，进入循环')
+            sleep(5)
+            # 开始播放
+            while True:
+                sleep(1)
+                try:
+                    print("正在关闭弹窗")
+                    closeTheAlert(driver)
+                except:
+                    print("关闭弹窗失败")
+                try:
+                    # 播放视频，防止其他原因暂停播放
+                    unPause(driver)
+                except:
+                    pass
 
-        time.sleep(0.5)
-        # 通存放现在已完成的课程的列表
-        Nowicofinish = driver.find_elements(By.CLASS_NAME, "fl.time_icofinish")
-        # 当现在已完成比之前已完成多一个，自动播放下一个视频
-        if len(Nowicofinish) == len(icofinishlist) + 1:
-            icofinishlist = driver.find_elements(By.CLASS_NAME, "fl.time_icofinish")  # 更新已完成的课程，列表
-            Allvideolist[len(icofinishlist)].click()
-            time.sleep(5)
+                sleep(1)
+                # 通存放现在已完成的课程的列表
+                nowFinishCurse = getTheFinishedCurse()
+                print(f'全部课程数：{len(Allvideolist)}')
+                print(f'之前已完成课程数：{len(lastFinishedCurse)}')
+                print(f'现在已完成课程数：{len(nowFinishCurse)}')
+
+                # 当现在已完成比之前已完成多一个，自动播放下一个视频
+                if len(nowFinishCurse) == len(lastFinishedCurse) + 1:
+                    lastFinishedCurse = nowFinishCurse
+                    Allvideolist[len(lastFinishedCurse)].click()
+                    sleep(5)
+        sleep(2)
