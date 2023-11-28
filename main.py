@@ -84,6 +84,7 @@ if __name__ == '__main__':
         print("等待进入播放页面")
         if driver.find_elements(By.CLASS_NAME, "clearfix.video"):
             print("已进入播放页面")
+            sleep(2)
             closeGarbageMessage()
             print("关闭垃圾弹窗，即将开始播放\n")
 
@@ -94,9 +95,9 @@ if __name__ == '__main__':
                 pass
 
             Allvideolist = getAllTheCurseLIst()
-            print("已保存全部课程列表")
+            print(f'全部课程数：     {len(Allvideolist)}')
             lastFinishedCurse = getTheFinishedCurse()
-            print(f'之前已完成课程数量：{len(lastFinishedCurse)}')
+            print(f'之前已完成课程数：{len(lastFinishedCurse)}')
 
             # 进入未完成课程页面
             Allvideolist[len(lastFinishedCurse)].click()
@@ -139,13 +140,11 @@ if __name__ == '__main__':
                 # 当现在已完成比之前已完成多一个，自动播放下一个视频
                 if len(nowFinishedCurse) == len(lastFinishedCurse) + 1:
                     Allvideolist[len(nowFinishedCurse)].click()
-                    Allvideolist[len(nowFinishedCurse)].click()
-                    sleep(1)
-                    Allvideolist[len(nowFinishedCurse)].click()
-                    Allvideolist[len(nowFinishedCurse)].click()
-                    sleep(1)
-                    Allvideolist[len(nowFinishedCurse)].click()
-                    Allvideolist[len(nowFinishedCurse)].click()
-                    lastFinishedCurse = nowFinishedCurse
+                    sleep(2)
+                    print(f"正在播放：{driver.find_element(By.CLASS_NAME, "current_play")}")
+                    print(f"要播放的：{Allvideolist[len(nowFinishedCurse)]}")
+                    if driver.find_element(By.CLASS_NAME, "current_play")==Allvideolist[len(nowFinishedCurse)]:
+                        lastFinishedCurse = nowFinishedCurse
+
 
         sleep(2)
