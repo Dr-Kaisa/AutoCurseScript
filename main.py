@@ -60,7 +60,7 @@ def unPause(driver):
 def closeTheAlert(driver):
     driver.find_element(By.CSS_SELECTOR, ".el-scrollbar__view>.topic>.radio>.topic-list>.topic-item svg").click()
     print('点击选项')
-
+    sleep(0.5)
     driver.find_element(By.CSS_SELECTOR, "#outContainer>.el-dialog__wrapper>.el-dialog>.el-dialog__footer span").click()
     print('点击关闭')
 
@@ -134,15 +134,17 @@ if __name__ == '__main__':
                 print(f'现在已完成课程数：{len(nowFinishedCurse)}')
                 try:
                     tt = driver.find_element(By.CSS_SELECTOR, ".current_play>.cataloguediv-c>div>div span").text
-                    print(f"当前视频进度：   {tt}")
+                    print(f"当前视频进度：    {tt}")
                 except:
                     pass
                 # 当现在已完成比之前已完成多一个，自动播放下一个视频
                 if len(nowFinishedCurse) == len(lastFinishedCurse) + 1:
+                    sleep(10)
                     Allvideolist[len(nowFinishedCurse)].click()
                     sleep(2)
                     print(f"正在播放：{driver.find_element(By.CLASS_NAME, "current_play")}")
                     print(f"要播放的：{Allvideolist[len(nowFinishedCurse)]}")
+                    # 检测视频是否切换成功
                     if driver.find_element(By.CLASS_NAME, "current_play")==Allvideolist[len(nowFinishedCurse)]:
                         lastFinishedCurse = nowFinishedCurse
 
