@@ -30,7 +30,7 @@ def login(driver, args):
     except:
         pass
 
-
+# 关闭垃圾弹窗
 def closeGarbageMessage():
     try:
         driver.find_element(By.CLASS_NAME, "talk-later-btn").click()
@@ -53,12 +53,12 @@ def getAllTheCurseLIst():
 def getTheFinishedCurse():
     return driver.find_elements(By.CLASS_NAME, "fl.time_icofinish")
 
-
+# 播放视频
 def unPause(driver):
     video = driver.find_element(By.ID, 'vjs_container_html5_api')
     driver.execute_script("arguments[0].play()", video)
 
-
+# 关闭课堂测试弹窗
 def closeTheAlert(driver):
     driver.find_element(By.CSS_SELECTOR, ".el-scrollbar__view>.topic>.radio>.topic-list>.topic-item svg").click()
     sleep(0.5)
