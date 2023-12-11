@@ -85,8 +85,7 @@ if __name__ == '__main__':
         print("等待进入播放页面")
         if driver.find_elements(By.CLASS_NAME, "clearfix.video"):
             print("已进入播放页面")
-            progressBar = tqdm(total=100,desc='当前视频进度',bar_format='{l_bar}{bar}|')
-            progressBar.clear()
+
             sleep(2)
             closeGarbageMessage()
             try:
@@ -102,12 +101,12 @@ if __name__ == '__main__':
                 pass
 
             Allvideolist = getAllTheCurseLIst()
-            print(f'全部课程数：     {len(Allvideolist)}')
+            print(f'全部课程数：    {len(Allvideolist)}')
+            lastFinishedCurse = getTheFinishedCurse()
             print(f'之前已完成课程数：{len(lastFinishedCurse)}')
             if len(Allvideolist)==len(lastFinishedCurse):
                 print('该课程已全部完成！')
                 exit(0)
-            lastFinishedCurse = getTheFinishedCurse()
             print("-------------------------------------------------------")
             # 进入未完成课程页面
             Allvideolist[len(lastFinishedCurse)].click()
@@ -115,6 +114,10 @@ if __name__ == '__main__':
             Allvideolist[len(lastFinishedCurse)].click()
             sleep(0.5)
             Allvideolist[len(lastFinishedCurse)].click()
+
+            # 创建进度条
+            progressBar = tqdm(total=100, desc='当前视频进度', bar_format='{l_bar}{bar}|')
+            progressBar.clear()
             # 开始播放
             while True:
 
