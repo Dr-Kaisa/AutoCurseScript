@@ -3,7 +3,7 @@ from time import sleep
 from selenium.webdriver.common.by import By
 from tqdm import tqdm
 
-
+# 从account.txt中获取账号密码
 def getAccount():
     file = open("account.txt")
     account = file.readline()
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     driver = ini()
 
 
-    # 获取账号密码并登录
+    # 等待页面元素加载，并获取账号密码并登录
     while True:
         if driver.find_element(By.ID, "lPassword"):
             print("登录中...")
@@ -103,8 +103,11 @@ if __name__ == '__main__':
 
             Allvideolist = getAllTheCurseLIst()
             print(f'全部课程数：     {len(Allvideolist)}')
-            lastFinishedCurse = getTheFinishedCurse()
             print(f'之前已完成课程数：{len(lastFinishedCurse)}')
+            if len(Allvideolist)==len(lastFinishedCurse):
+                print('该课程已全部完成！')
+                exit(0)
+            lastFinishedCurse = getTheFinishedCurse()
             print("-------------------------------------------------------")
             # 进入未完成课程页面
             Allvideolist[len(lastFinishedCurse)].click()
