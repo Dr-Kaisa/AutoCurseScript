@@ -154,7 +154,7 @@ if __name__ == '__main__':
                     pass
                 # 当现在已完成比之前已完成多一个，自动播放下一个视频
                 if len(nowFinishedCurse) == len(lastFinishedCurse) + 1:
-                    sleep(10)
+                    sleep(15)
                     Allvideolist[len(nowFinishedCurse)].click()
                     sleep(2)
                     # 检测视频是否切换成功
